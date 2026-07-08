@@ -1,2 +1,12 @@
+# Raw CSI datasets and derived outputs from data-collection sessions
+# (each contributor's folder, e.g. jhj/, kmh/, swt_kmh/, contains only these)
 *.csv
+*.png
 *.txt
+!requirements.txt
+
+# Python bytecode cache
+__pycache__/
+
+# Local/machine-specific tool settings
+.claude/

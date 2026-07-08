@@ -66,6 +66,9 @@ dkms.conf
 **/.DS_Store
 **/.vscode
 
+# Windows shortcut files (machine-specific, never useful in-repo)
+*.lnk
+
 # Application project files
 **/sdkconfig
 **/sdkconfig.old

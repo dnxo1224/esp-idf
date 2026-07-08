@@ -24,14 +24,22 @@ def collect_csi(port, output_file, baudrate=921600):
         csv_writer = csv.writer(csvfile)
         header_written = False
 
+        start_time = time.time()
+        duration = getattr(collect_csi, 'duration', None)
+
         try:
             while True:
+                # Check if duration is set and time is up
+                if duration is not None and (time.time() - start_time) >= duration:
+                    print(f"\n[*] Collection stopped after {duration} seconds. File saved.")
+                    break
+
                 line_bytes = ser.readline()
-                
+
                 # If timeout occurred, just continue looping (allows Ctrl+C to be caught)
                 if not line_bytes:
                     continue
-                
+
                 try:
                     # Decode bytes to string
                     strings = line_bytes.decode('utf-8', errors='ignore').strip()
@@ -78,6 +86,8 @@ if __name__ == '__main__':
                         help='Path to save the output CSV file')
     parser.add_argument('-b', '--baudrate', dest='baudrate', action='store', type=int, default=921600,
                         help='Serial baudrate (default: 921600 for esp-csi)')
+    parser.add_argument('-t', '--duration', dest='duration', action='store', type=int, default=None,
+                        help='Collection duration in seconds (optional)')
 
     args = parser.parse_args()
 
@@ -85,6 +95,12 @@ if __name__ == '__main__':
     out_dir = os.path.dirname(args.output_file)
     if out_dir and not os.path.exists(out_dir):
         os.makedirs(out_dir)
+
+    # Pass duration to collect_csi via function attribute
+    if args.duration is not None:
+        setattr(collect_csi, 'duration', args.duration)
+    else:
+        setattr(collect_csi, 'duration', None)
 
     collect_csi(args.port, args.output_file, args.baudrate)
 
